@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from collections import deque, OrderedDict
 from enum import Enum
 from timeit import default_timer as timer
 import chess
@@ -9,7 +10,6 @@ class Algo(Enum):
     ABP = 0
     NO_ABP = 1
 
-# Very basic evaluation function
 def evaluate(board: chess.Board, num_moves: int, color_to_play: chess.Color) -> float:
     """Chess position evaluation function
 
@@ -47,6 +47,7 @@ def evaluate(board: chess.Board, num_moves: int, color_to_play: chess.Color) -> 
 
     return evaluation
 
+
 def minimax_abp(board: chess.Board, depth: int, num_moves: int, is_maximizing: bool, alpha: int, beta: int, color_to_play: chess.Color) -> float:
     """Minimax with alpha beta pruning
 
@@ -66,10 +67,7 @@ def minimax_abp(board: chess.Board, depth: int, num_moves: int, is_maximizing: b
     # print("Alpha: {} Beta: {}".format(alpha, beta))
 
     if(depth == 0 or board.is_checkmate()):
-        return evaluate(board, num_moves, color_to_play) 
-
-    # Generate a list of all legal moves to play in this position
-    legal_moves = board.generate_legal_moves()
+        return evaluate(board, num_moves, color_to_play)
 
     # Set the eval to either very large negative of very large positive
     if(is_maximizing):
@@ -77,11 +75,37 @@ def minimax_abp(board: chess.Board, depth: int, num_moves: int, is_maximizing: b
     else:
         best_move = 9999
 
+    # Let's make a move deque to sort it so checks and captures are front of the list
+    # Also going to make a hokey dictionary for storing capture moves...since there's a generate function
+    # Honestly not sure if that generate function is quick...
+    legal_moves = deque()
+    capture_moves = set()
+
+    # Generate a list of all legal moves to play in this position
+    legal_moves_list = board.generate_legal_moves()
+    capture_move_list = board.generate_legal_captures()
+
+    for move in capture_move_list:
+        legal_moves.append(move)
+        capture_moves.add(move)
+
+    for move in legal_moves_list:
+        # Going to do a quick check if the move creates check
+        board.push(move)
+        if(board.is_check()):
+            legal_moves.appendleft(move)
+        else:
+            if move not in capture_moves:
+                legal_moves.append(move)
+        board.pop()
+
     # let's step through each legal move
-    for move in legal_moves:
+    while legal_moves:
+        move = legal_moves.popleft()
         if(is_maximizing):
             board.push(move)
-            best_move = max(best_move, minimax_abp(board, depth-1, num_moves+1, not is_maximizing, alpha, beta, color_to_play))
+            best_move = max(best_move, minimax_abp(
+                board, depth-1, num_moves+1, not is_maximizing, alpha, beta, color_to_play))
             board.pop()
             alpha = max(alpha, best_move)
             if(beta <= alpha):
@@ -89,13 +113,15 @@ def minimax_abp(board: chess.Board, depth: int, num_moves: int, is_maximizing: b
 
         else:
             board.push(move)
-            best_move = min(best_move, minimax_abp(board, depth-1, num_moves+1,not is_maximizing,  alpha, beta,  color_to_play))
+            best_move = min(best_move, minimax_abp(
+                board, depth-1, num_moves+1, not is_maximizing,  alpha, beta,  color_to_play))
             board.pop()
             beta = min(beta, best_move)
             if(beta <= alpha):
                 break
 
     return best_move
+
 
 def minimax(board: chess.Board, depth: int, num_moves: int, is_maximizing: bool, color_to_play: chess.Color) -> float:
     """ Minimax evaluation algorithm.
@@ -112,7 +138,7 @@ def minimax(board: chess.Board, depth: int, num_moves: int, is_maximizing: bool,
     """
     # Base case for mini max, which should trigger on checkmates as well
     if(depth == 0 or board.is_checkmate()):
-        return evaluate(board, num_moves, color_to_play) 
+        return evaluate(board, num_moves, color_to_play)
 
     # Generate a list of all legal moves to play in this position
     legal_moves = board.generate_legal_moves()
@@ -127,18 +153,22 @@ def minimax(board: chess.Board, depth: int, num_moves: int, is_maximizing: bool,
     for move in legal_moves:
         if(is_maximizing):
             board.push(move)
-            best_move = max(best_move, minimax(board, depth-1, num_moves+1, not is_maximizing, color_to_play))
+            best_move = max(best_move, minimax(
+                board, depth-1, num_moves+1, not is_maximizing, color_to_play))
             board.pop()
 
         else:
             board.push(move)
-            best_move = min(best_move, minimax(board, depth-1, num_moves+1,not is_maximizing, color_to_play))
+            best_move = min(best_move, minimax(
+                board, depth-1, num_moves+1, not is_maximizing, color_to_play))
             board.pop()
 
     return best_move
 
 # This function might be unnecessary we'll see
-def runminimax(board : chess.Board, depth: int, color_to_play: chess.Color, algo_type: Algo) -> str:
+
+
+def runminimax(board: chess.Board, depth: int, color_to_play: chess.Color, algo_type: Algo) -> str:
     """Root for minimax
 
     Args:
@@ -159,15 +189,17 @@ def runminimax(board : chess.Board, depth: int, color_to_play: chess.Color, algo
 
     # We also start as the maximizing player as we are making the move
     is_maximizing = True
-    
+
     # let's step through each legal move
     for move in legal_moves:
         if(is_maximizing):
             board.push(move)
             if algo_type is Algo.ABP:
-                eval = minimax_abp(board, depth, 0, not is_maximizing, -9999, 9999, color_to_play)
+                eval = minimax_abp(
+                    board, depth, 0, not is_maximizing, -9999, 9999, color_to_play)
             elif algo_type is Algo.NO_ABP:
-                eval = minimax(board, depth, 0, not is_maximizing, color_to_play)
+                eval = minimax(board, depth, 0,
+                               not is_maximizing, color_to_play)
             board.pop()
             if(eval > best_eval):
                 best_eval = eval
@@ -175,10 +207,12 @@ def runminimax(board : chess.Board, depth: int, color_to_play: chess.Color, algo
 
     return best_move
 
+
 def main():
     board_fen_string = "3k4/8/1q5p/8/8/4B3/7R/4K3 w - - 0 1"
     board = chess.Board(fen=board_fen_string)
     print(board)
+
     next_move = runminimax(board, 2, chess.WHITE, Algo.ABP)
     print(next_move)
     board.push(next_move)
@@ -215,6 +249,7 @@ def main():
     print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
     board.push(next_move)
     print(board)
+
 
 if __name__ == '__main__':
     main()
