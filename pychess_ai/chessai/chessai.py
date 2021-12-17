@@ -21,12 +21,11 @@ class ChessAi:
         self._board.push(move)
 
     def take_turn(self, color: chess.Color) -> str:
-        next_move = self.get_next_move(color)
-        self._board.push(next_move)
+        next_move = self._board.san(self.get_next_move(color))
+        self._board.push_san(next_move)
         print(self._board)
         return next_move
-
-    def get_next_move(self, color: chess.Color) -> str:
+    def get_next_move(self, color: chess.Color) -> chess.Move:
         return self._ai.get_next_move(self._board, color)
 
     def print_board(self) -> None:

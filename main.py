@@ -45,11 +45,11 @@ def main():
 
     print("------")
 
-    board_fen_string = "4r1k1/5ppp/4q3/5b2/8/8/5PPP/1Q4K1 b - - 0 1"
-    chess_ai = ChessAi(Algo.NO_ABP, 3, board_fen_string)
+    board_fen_string = "1Q6/p7/q1p3p1/3p4/2kPpP2/4P1P1/P2B2K1/3r4 w - - 4 34"
+    chess_ai = ChessAi(Algo.ABP, 3, board_fen_string)
     chess_ai.print_board()
     start = timer()
-    next_move = chess_ai.take_turn(chess.BLACK)
+    next_move = chess_ai.take_turn(chess.WHITE)
     end = timer()
     print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
 
