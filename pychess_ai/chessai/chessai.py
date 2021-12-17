@@ -25,6 +25,7 @@ class ChessAi:
         self._board.push_san(next_move)
         print(self._board)
         return next_move
+
     def get_next_move(self, color: chess.Color) -> chess.Move:
         return self._ai.get_next_move(self._board, color)
 
