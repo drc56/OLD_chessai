@@ -4,11 +4,38 @@ from enum import Enum
 from timeit import default_timer as timer
 import chess
 
+
 class Algo(Enum):
     """Enum for selecting which algorithm to run
     """
     ABP = 0
     NO_ABP = 1
+
+
+def evaluate_rook(board: chess.Board, square: chess.Square, piece: chess.Piece) -> float:
+    file = chess.square_file(square)
+    open_file = True
+
+    # # Check for file being open
+    for i in range(0, 7):
+        square_to_check = chess.square(file, i)
+        if square_to_check == square:
+            continue
+        else:
+            piece_in_way = board.piece_at(square_to_check)
+            if piece_in_way is None:
+                continue
+            # print(piece_in_way.piece_type)
+            if piece_in_way.color != piece.color or (piece_in_way.color == piece.color and piece_in_way.piece_type != chess.QUEEN and piece_in_way.piece_type != chess.ROOK):
+                open_file = False
+
+    eval = 50.0
+
+    if open_file:
+        eval = (eval) * 1.25
+
+    return eval
+
 
 def evaluate(board: chess.Board, num_moves: int, color_to_play: chess.Color) -> float:
     """Chess position evaluation function
@@ -27,24 +54,24 @@ def evaluate(board: chess.Board, num_moves: int, color_to_play: chess.Color) -> 
 
     material_value = 0.0
     for square, piece in board.piece_map().items():
+        # print(square, piece)
         piece_value = 0.0
         if piece.piece_type == chess.PAWN:
-            piece_value = 1.0
+            piece_value = 10.0
         elif piece.piece_type == chess.KNIGHT:
-            piece_value = 3.0
+            piece_value = 30.0
         elif piece.piece_type == chess.BISHOP:
-            piece_value = 3.0
+            piece_value = 30.0
         elif piece.piece_type == chess.ROOK:
-            piece_value = 5.0
+            piece_value = evaluate_rook(board, square, piece)
         elif piece.piece_type == chess.QUEEN:
-            piece_value = 9.0
+            piece_value = 90.0
         if color_to_play is piece.color:
             material_value += piece_value
         else:
             material_value -= piece_value
 
     evaluation += material_value
-
     return evaluation
 
 
@@ -201,6 +228,7 @@ def runminimax(board: chess.Board, depth: int, color_to_play: chess.Color, algo_
                 eval = minimax(board, depth, 0,
                                not is_maximizing, color_to_play)
             board.pop()
+            # print(move, eval)
             if(eval > best_eval):
                 best_eval = eval
                 best_move = move
@@ -209,34 +237,33 @@ def runminimax(board: chess.Board, depth: int, color_to_play: chess.Color, algo_
 
 
 def main():
-    board_fen_string = "3k4/8/1q5p/8/8/4B3/7R/4K3 w - - 0 1"
-    board = chess.Board(fen=board_fen_string)
-    print(board)
+    # board_fen_string = "3k4/8/1q5p/8/8/4B3/7R/4K3 w - - 0 1"
+    # board = chess.Board(fen=board_fen_string)
+    # print(board)
+    # next_move = runminimax(board, 1, chess.WHITE, Algo.ABP)
+    # print(next_move)
+    # board.push(next_move)
+    # print(board)
 
-    next_move = runminimax(board, 2, chess.WHITE, Algo.ABP)
-    print(next_move)
-    board.push(next_move)
-    print(board)
+    # print("------")
 
-    print("------")
+    # board_fen_string = "3k4/7R/1q5p/8/8/4B3/6Q1/4K3 w - - 0 1"
+    # board = chess.Board(fen=board_fen_string)
+    # print(board)
+    # next_move = runminimax(board, 3, chess.WHITE, Algo.ABP)
+    # print(next_move)
+    # board.push(next_move)
+    # print(board)
 
-    board_fen_string = "3k4/7R/1q5p/8/8/4B3/6Q1/4K3 w - - 0 1"
-    board = chess.Board(fen=board_fen_string)
-    print(board)
-    next_move = runminimax(board, 3, chess.WHITE, Algo.ABP)
-    print(next_move)
-    board.push(next_move)
-    print(board)
+    # print("------")
 
-    print("------")
-
-    board_fen_string = "1q4k1/5ppp/8/8/3BQ3/8/8/4RK2 w - - 0 1"
-    board = chess.Board(fen=board_fen_string)
-    print(board)
-    next_move = runminimax(board, 3, chess.WHITE, Algo.ABP)
-    print(next_move)
-    board.push(next_move)
-    print(board)
+    # board_fen_string = "1q4k1/5ppp/8/8/3BQ3/8/8/4RK2 w - - 0 1"
+    # board = chess.Board(fen=board_fen_string)
+    # print(board)
+    # next_move = runminimax(board, 3, chess.WHITE, Algo.ABP)
+    # print(next_move)
+    # board.push(next_move)
+    # print(board)
 
     print("------")
 
@@ -245,6 +272,18 @@ def main():
     print(board)
     start = timer()
     next_move = runminimax(board, 3, chess.BLACK, Algo.ABP)
+    end = timer()
+    print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
+    board.push(next_move)
+    print(board)
+
+    print("------")
+
+    board_fen_string = "4rk2/p4ppp/1p2p3/3p4/3P4/1P2P3/P4PPP/4RK2 w - - 0 1"
+    board = chess.Board(fen=board_fen_string)
+    print(board)
+    start = timer()
+    next_move = runminimax(board, 5, chess.WHITE, Algo.ABP)
     end = timer()
     print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
     board.push(next_move)
