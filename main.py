@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-from algos import Algo
-from chessai import ChessAi
+from pychess_ai.algos import Algo
+from pychess_ai.chessai import ChessAi
 from timeit import default_timer as timer
 import chess
 

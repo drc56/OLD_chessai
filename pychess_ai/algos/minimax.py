@@ -1,4 +1,4 @@
-from algos import BaseChessAlgo
+from pychess_ai.algos import BaseChessAlgo
 import chess
 
 class MiniMax(BaseChessAlgo):

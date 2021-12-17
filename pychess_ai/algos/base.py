@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from collections import deque
 from enum import Enum
-from evaluator import Evaluator
+from pychess_ai.evaluator import Evaluator
 import chess
 
 class Algo(Enum):
