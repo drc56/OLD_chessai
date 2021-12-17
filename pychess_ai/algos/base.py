@@ -5,11 +5,13 @@ from enum import Enum
 from pychess_ai.evaluator import Evaluator
 import chess
 
+
 class Algo(Enum):
-    """Enum for selecting which algorithm to run
-    """
+    """Enum for selecting which algorithm to run"""
+
     ABP = 0
     NO_ABP = 1
+
 
 class BaseChessAlgo(ABC):
     def __init__(self, depth: int):
@@ -17,7 +19,9 @@ class BaseChessAlgo(ABC):
         self._evaluator = Evaluator()
 
     @abstractmethod
-    def get_next_move(self, board: chess.Board, color_to_play: chess.Color) -> chess.Move:
+    def get_next_move(
+        self, board: chess.Board, color_to_play: chess.Color
+    ) -> chess.Move:
         raise NotImplementedError("Base Class doesn't have a get_next_move")
 
     @staticmethod
@@ -39,7 +43,7 @@ class BaseChessAlgo(ABC):
         for move in legal_moves_list:
             # Going to do a quick check if the move creates check
             board.push(move)
-            if(board.is_check()):
+            if board.is_check():
                 legal_moves.appendleft(move)
             else:
                 if move not in capture_moves:

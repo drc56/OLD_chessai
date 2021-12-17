@@ -1,11 +1,13 @@
-
 import chess
 
-class Evaluator():
+
+class Evaluator:
     def __init__(self):
         pass
 
-    def evaluate(self, board: chess.Board, num_moves: int, color_to_play: chess.Color) -> float:
+    def evaluate(
+        self, board: chess.Board, num_moves: int, color_to_play: chess.Color
+    ) -> float:
         """Chess position evaluation function
 
         Args:
@@ -42,7 +44,9 @@ class Evaluator():
         evaluation += material_value
         return evaluation
 
-    def _evaluate_rook(self, board: chess.Board, square: chess.Square, piece: chess.Piece) -> float:
+    def _evaluate_rook(
+        self, board: chess.Board, square: chess.Square, piece: chess.Piece
+    ) -> float:
         file = chess.square_file(square)
         open_file = True
 
@@ -56,7 +60,11 @@ class Evaluator():
                 if piece_in_way is None:
                     continue
                 # print(piece_in_way.piece_type)
-                if piece_in_way.color != piece.color or (piece_in_way.color == piece.color and piece_in_way.piece_type != chess.QUEEN and piece_in_way.piece_type != chess.ROOK):
+                if piece_in_way.color != piece.color or (
+                    piece_in_way.color == piece.color
+                    and piece_in_way.piece_type != chess.QUEEN
+                    and piece_in_way.piece_type != chess.ROOK
+                ):
                     open_file = False
 
         eval = 50.0
