@@ -101,7 +101,7 @@ class Evaluator:
 
         if open_file:
             eval = (eval) * 1.25
-        
+
         eval = eval * ROOK_EVAL_DICT[piece.color][square]
 
         return eval

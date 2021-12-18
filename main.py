@@ -41,7 +41,7 @@ def main():
     print("------")
 
     board_fen_string = "4r1k1/5ppp/4q3/5b2/8/8/5PPP/1Q4K1 b - - 0 1"
-    chess_ai = ChessAi(Algo.ABP, 3, board_fen_string)
+    chess_ai = ChessAi(Algo.ABP, 1, board_fen_string)
     chess_ai.print_board()
     start = timer()
     next_move = chess_ai.take_turn(chess.BLACK)
@@ -60,6 +60,15 @@ def main():
     end = timer()
     print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
 
+    board_fen_string = "5bk1/6p1/p1qr1pQP/1p2r3/1P6/P1NR4/5PP1/6K1 w - - 0 38"
+    chess_ai = ChessAi(Algo.ABP, 1, board_fen_string)
+    chess_ai.print_board()
+    print(chess_ai._board.fen())
+    print(chess_ai._board.epd())
+    start = timer()
+    next_move = chess_ai.take_turn(chess.WHITE)
+    end = timer()
+    print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
 
 
     # board_fen_string = "4rk2/p4ppp/1p2p3/3p4/3P4/1P2P3/P4PPP/4RK2 w - - 0 1"

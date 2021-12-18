@@ -43,7 +43,7 @@ class MiniMaxABP(BaseChessAlgo):
                     color_to_play,
                 )
                 board.pop()
-                # print(move, eval)
+                print(move, eval)
                 if eval > best_eval:
                     best_eval = eval
                     best_move = move
@@ -128,12 +128,12 @@ class MiniMaxABP(BaseChessAlgo):
         num_moves: int,
         color_to_play: chess.Color,
     ) -> float:
-
+        # print(beta, alpha)
         eval = self._evaluator.evaluate(board, num_moves, color_to_play)
-
         if eval >= beta:
+            # print("here")
             return beta
-        if eval < alpha:
+        if eval > alpha:
             alpha = eval
         legal_moves = self.generate_check_capture_move_list_order(board, True)
 
@@ -146,7 +146,7 @@ class MiniMaxABP(BaseChessAlgo):
             board.pop()
             if eval >= beta:
                 return beta
-            else:
+            if eval > alpha:
                 alpha = eval
 
         return alpha
