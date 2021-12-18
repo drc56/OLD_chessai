@@ -1,6 +1,29 @@
+from collections import deque
+from dataclasses import dataclass
 import chess
 
 # fmt: off
+PAWN_EVAL_DICT = {
+    chess.WHITE :
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+        1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25,
+        1.0, 1.0, 1.0, 2.5, 2.5, 1.0, 1.0, 1.0,
+        1.0, 1.0, 1.5, 2.5, 2.5, 1.5, 1.0, 1.0,
+        2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 2.0, 2.0,
+        5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    chess.BLACK :
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0,
+        2.0, 2.0, 3.0, 3.0, 3.0, 3.0, 2.0, 2.0,
+        1.0, 1.0, 1.5, 2.5, 2.5, 1.5, 1.0, 1.0,
+        1.0, 1.0, 1.5, 2.5, 2.5, 1.5, 1.0, 1.0,
+        1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25,
+        1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+}
+
 ROOK_EVAL_DICT = {
     chess.WHITE :
         [1.0, 1.0, 1.0, 1.5, 1.5, 1.0, 1.0, 1.0,
@@ -21,7 +44,35 @@ ROOK_EVAL_DICT = {
         0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
         1.0, 1.0, 1.0, 1.5, 1.5, 1.0, 1.0, 1.0],
 }
+
+QUEEN_EVAL_DICT = {
+    chess.WHITE :
+        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+        1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0,
+        1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0,
+        1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0,
+        1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0,
+        1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0,
+        1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    chess.BLACK :
+        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+        1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0,
+        1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0,
+        1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0,
+        1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0,
+        1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0,
+        1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+}
 # fmt: on
+
+
+@dataclass
+class EvalReturnType:
+    move: chess.Move
+    eval: float
+    line: deque
 
 
 class Evaluator:
@@ -31,7 +82,7 @@ class Evaluator:
 
     def evaluate(
         self, board: chess.Board, num_moves: int, color_to_play: chess.Color
-    ) -> float:
+    ) -> EvalReturnType:
         """Chess position evaluation function
 
         Args:
@@ -42,22 +93,31 @@ class Evaluator:
         Returns:
             float: The evaluation
         """
-
+        # Build the line we evaluated
+        line = board.move_stack[len(board.move_stack) - (num_moves + 1) :]
         # Gonna use the FEN without the turn
         epd_key = board.epd()
         if epd_key in self._position_table:
-            return self._position_table[epd_key]
+            return EvalReturnType(
+                move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
+                eval=self._position_table[epd_key],
+                line=line,
+            )
 
         evaluation = 0.0
         if board.is_checkmate():
-            return 1000.0 - num_moves
+            return EvalReturnType(
+                move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
+                eval=10000.0 - num_moves,
+                line=line,
+            )
 
         material_value = 0.0
         for square, piece in board.piece_map().items():
             # print(square, piece)
             piece_value = 0.0
             if piece.piece_type == chess.PAWN:
-                piece_value = 10.0
+                piece_value = self._evaluate_pawn(board, square, piece)
             elif piece.piece_type == chess.KNIGHT:
                 piece_value = 30.0
             elif piece.piece_type == chess.BISHOP:
@@ -65,7 +125,7 @@ class Evaluator:
             elif piece.piece_type == chess.ROOK:
                 piece_value = self._evaluate_rook(board, square, piece)
             elif piece.piece_type == chess.QUEEN:
-                piece_value = 90.0
+                piece_value = self._evaluate_queen(board, square, piece)
             if color_to_play is piece.color:
                 material_value += piece_value
             else:
@@ -73,7 +133,22 @@ class Evaluator:
 
         evaluation += material_value
         self._position_table[epd_key] = evaluation
-        return evaluation
+
+        # if board.is_check() and board.turn == color_to_play:
+        #     evaluation -= 100.0
+        # elif board.is_check() and board.turn != color_to_play:
+        #     evaluation += 100.0
+
+        return EvalReturnType(
+            move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
+            eval=evaluation,
+            line=line,
+        )
+
+    def _evaluate_pawn(
+        self, board: chess.Board, square: chess.Square, piece: chess.Piece
+    ) -> float:
+        return 10.0 * PAWN_EVAL_DICT[piece.color][square]
 
     def _evaluate_rook(
         self, board: chess.Board, square: chess.Square, piece: chess.Piece
@@ -105,3 +180,8 @@ class Evaluator:
         eval = eval * ROOK_EVAL_DICT[piece.color][square]
 
         return eval
+
+    def _evaluate_queen(
+        self, board: chess.Board, square: chess.Square, piece: chess.Piece
+    ) -> float:
+        return 90.0 * QUEEN_EVAL_DICT[piece.color][square]

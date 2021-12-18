@@ -1,8 +1,11 @@
 #!/usr/bin/python3
+from pychess_ai.evaluator import Evaluator
 from pychess_ai.algos import Algo
 from pychess_ai.chessai import ChessAi
 from timeit import default_timer as timer
 import chess
+
+from pychess_ai.evaluator.evaluator import Evaluator
 
 def main():
 
@@ -51,7 +54,7 @@ def main():
     # print("------")
 
     # board_fen_string = "1Q6/p7/q1p3p1/3p4/2kPpP2/4P1P1/P2B2K1/3r4 w - - 4 34"
-    # chess_ai = ChessAi(Algo.ABP, 1, board_fen_string)
+    # chess_ai = ChessAi(Algo.ABP, 3, board_fen_string)
     # chess_ai.print_board()
     # print(chess_ai._board.fen())
     # print(chess_ai._board.epd())
@@ -61,7 +64,7 @@ def main():
     # print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
 
     board_fen_string = "5bk1/6p1/p1qr1pQP/1p2r3/1P6/P1NR4/5PP1/6K1 w - - 0 38"
-    chess_ai = ChessAi(Algo.ABP, 5, board_fen_string)
+    chess_ai = ChessAi(Algo.ABP, 4, board_fen_string)
     chess_ai.print_board()
     print(chess_ai._board.fen())
     print(chess_ai._board.epd())
@@ -69,6 +72,25 @@ def main():
     next_move = chess_ai.take_turn(chess.WHITE)
     end = timer()
     print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
+
+    board_fen_string = "5bk1/6p1/p1qr1pQP/1p2r3/1P6/P1NR4/5PP1/6K1 w - - 0 38"
+    board = chess.Board(fen=board_fen_string)
+    board.push_san("Qxg7+")
+    board.push_san("Bxg7")
+    evaluator = Evaluator()
+    result = evaluator.evaluate(board, 2, chess.WHITE)
+    print(result.eval)
+
+
+    # board_fen_string = "5bk1/6p1/p1qr1pQP/1p2r3/1P6/P2R4/4NPP1/6K1 b - - 1 1"
+    # chess_ai = ChessAi(Algo.ABP, 2, board_fen_string)
+    # chess_ai.print_board()
+    # print(chess_ai._board.fen())
+    # print(chess_ai._board.epd())
+    # start = timer()
+    # next_move = chess_ai.take_turn(chess.BLACK)
+    # end = timer()
+    # print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
 
 
     # board_fen_string = "4rk2/p4ppp/1p2p3/3p4/3P4/1P2P3/P4PPP/4RK2 w - - 0 1"
