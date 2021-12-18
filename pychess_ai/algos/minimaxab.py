@@ -43,7 +43,7 @@ class MiniMaxABP(BaseChessAlgo):
                     color_to_play,
                 )
                 board.pop()
-                print(move, eval)
+                print(board.san(move), eval)
                 if eval > best_eval:
                     best_eval = eval
                     best_move = move
@@ -60,11 +60,11 @@ class MiniMaxABP(BaseChessAlgo):
         beta: int,
         color_to_play: chess.Color,
     ) -> float:
-        if board.is_checkmate():
+        if board.is_checkmate() or depth == 0:
             return self._evaluator.evaluate(board, num_moves, color_to_play)
 
-        if depth == 0:
-            return self._quiescence_search(board, alpha, beta, num_moves, color_to_play)
+        # if depth == 0:
+        #     return self._quiescence_search(board, alpha, beta, num_moves, color_to_play, is_maximizing)
 
         # Set the eval to either very large negative of very large positive
         if is_maximizing:
@@ -118,6 +118,7 @@ class MiniMaxABP(BaseChessAlgo):
                 if beta <= alpha:
                     break
 
+        # print(alpha, beta)
         return best_move
 
     def _quiescence_search(
@@ -127,26 +128,42 @@ class MiniMaxABP(BaseChessAlgo):
         beta: int,
         num_moves: int,
         color_to_play: chess.Color,
+        is_maximizing: bool,
     ) -> float:
         # print(beta, alpha)
         eval = self._evaluator.evaluate(board, num_moves, color_to_play)
-        if eval >= beta:
-            # print("here")
-            return beta
-        if eval > alpha:
-            alpha = eval
+        if is_maximizing:
+            if eval >= beta:
+                # print("here")
+                return beta
+            if eval > alpha:
+                alpha = eval
+        else:
+            if eval <= beta:
+                # print("here")
+                return beta
+            if eval < alpha:
+                alpha = eval
         legal_moves = self.generate_check_capture_move_list_order(board, True)
 
         while legal_moves:
             next_move = legal_moves.popleft()
             board.push(next_move)
             eval = self._quiescence_search(
-                board, alpha, beta, num_moves + 1, color_to_play
+                board, alpha, beta, num_moves + 1, color_to_play, is_maximizing
             )
             board.pop()
-            if eval >= beta:
-                return beta
-            if eval > alpha:
-                alpha = eval
+            if is_maximizing:
+                if eval >= beta:
+                    # print("here")
+                    return beta
+                if eval > alpha:
+                    alpha = eval
+            else:
+                if eval <= beta:
+                    # print("here")
+                    return beta
+                if eval < alpha:
+                    alpha = eval
 
         return alpha

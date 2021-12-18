@@ -38,30 +38,30 @@ def main():
     # board.push(next_move)
     # print(board)
 
-    print("------")
+    # print("------")
 
-    board_fen_string = "4r1k1/5ppp/4q3/5b2/8/8/5PPP/1Q4K1 b - - 0 1"
-    chess_ai = ChessAi(Algo.ABP, 1, board_fen_string)
-    chess_ai.print_board()
-    start = timer()
-    next_move = chess_ai.take_turn(chess.BLACK)
-    end = timer()
-    print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
+    # board_fen_string = "4r1k1/5ppp/4q3/5b2/8/8/5PPP/1Q4K1 b - - 0 1"
+    # chess_ai = ChessAi(Algo.ABP, 1, board_fen_string)
+    # chess_ai.print_board()
+    # start = timer()
+    # next_move = chess_ai.take_turn(chess.BLACK)
+    # end = timer()
+    # print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
 
-    print("------")
+    # print("------")
 
-    board_fen_string = "1Q6/p7/q1p3p1/3p4/2kPpP2/4P1P1/P2B2K1/3r4 w - - 4 34"
-    chess_ai = ChessAi(Algo.ABP, 1, board_fen_string)
-    chess_ai.print_board()
-    print(chess_ai._board.fen())
-    print(chess_ai._board.epd())
-    start = timer()
-    next_move = chess_ai.take_turn(chess.WHITE)
-    end = timer()
-    print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
+    # board_fen_string = "1Q6/p7/q1p3p1/3p4/2kPpP2/4P1P1/P2B2K1/3r4 w - - 4 34"
+    # chess_ai = ChessAi(Algo.ABP, 1, board_fen_string)
+    # chess_ai.print_board()
+    # print(chess_ai._board.fen())
+    # print(chess_ai._board.epd())
+    # start = timer()
+    # next_move = chess_ai.take_turn(chess.WHITE)
+    # end = timer()
+    # print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
 
     board_fen_string = "5bk1/6p1/p1qr1pQP/1p2r3/1P6/P1NR4/5PP1/6K1 w - - 0 38"
-    chess_ai = ChessAi(Algo.ABP, 1, board_fen_string)
+    chess_ai = ChessAi(Algo.ABP, 5, board_fen_string)
     chess_ai.print_board()
     print(chess_ai._board.fen())
     print(chess_ai._board.epd())
