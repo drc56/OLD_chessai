@@ -106,11 +106,18 @@ class Evaluator:
 
         evaluation = 0.0
         if board.is_checkmate():
-            return EvalReturnType(
-                move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
-                eval=10000.0 - num_moves,
-                line=line,
-            )
+            if board.outcome() == color_to_play:
+                return EvalReturnType(
+                    move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
+                    eval=10000.0 - num_moves,
+                    line=line,
+                )
+            else:
+                return EvalReturnType(
+                    move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
+                    eval=(10000.0 - num_moves) * -1.0,
+                    line=line,
+                )
 
         material_value = 0.0
         for square, piece in board.piece_map().items():

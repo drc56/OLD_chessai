@@ -1,12 +1,13 @@
 from dataclasses import dataclass
+from collections import deque
 from pychess_ai.algos import BaseChessAlgo
 from pychess_ai.evaluator import EvalReturnType
 import chess
 
 
 class MiniMaxABP(BaseChessAlgo):
-    BASE_ALPHA_VAL = -9999
-    BASE_BETA_VAL = 9999
+    BASE_ALPHA_VAL = -99999
+    BASE_BETA_VAL = 99999
 
     def __init__(self, depth: int):
         super().__init__(depth)
@@ -32,7 +33,7 @@ class MiniMaxABP(BaseChessAlgo):
         """Root for minimax"""
 
         best_move = ""
-        best_eval = -9999
+        best_eval = -99999
         best_eval_object = None
 
         # Generate a list of all legal moves
@@ -90,9 +91,9 @@ class MiniMaxABP(BaseChessAlgo):
         # Set the eval to either very large negative of very large positive
         best_eval = None
         if is_maximizing:
-            best_move = -9999
+            best_move = -99999
         else:
-            best_move = 9999
+            best_move = 99999
 
         # Let's make a move deque to sort it so checks and captures are front of the list
         # Also going to make a hokey dictionary for storing capture moves...since there's a generate function
@@ -152,6 +153,22 @@ class MiniMaxABP(BaseChessAlgo):
         color_to_play: chess.Color,
     ) -> EvalReturnType:
         eval = self._evaluator.evaluate(board, num_moves, color_to_play)
+
+        # if board.is_check() is False:
+        #     if eval.eval >= beta:
+        #         return EvalReturnType(
+        #             move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
+        #             eval=beta,
+        #             line=board.move_stack[len(board.move_stack) - (num_moves + 1) :],
+        #         )
+        #     if eval.eval > alpha:
+        #         alpha = eval.eval
+
+        # if board.is_check():
+        #     legal_moves = deque(board.generate_legal_moves())
+        # else:
+        #     legal_moves = self.generate_check_capture_move_list_order(board, True)
+
         if eval.eval >= beta:
             return EvalReturnType(
                 move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
@@ -160,6 +177,7 @@ class MiniMaxABP(BaseChessAlgo):
             )
         if eval.eval > alpha:
             alpha = eval.eval
+
         legal_moves = self.generate_check_capture_move_list_order(board, True)
 
         while legal_moves:
@@ -169,7 +187,7 @@ class MiniMaxABP(BaseChessAlgo):
                 board, -beta, -alpha, num_moves + 1, color_to_play
             )
             # negate the eval as a part of quiescence_search
-            # eval.eval = eval.eval
+            eval.eval = eval.eval * -1.0
             board.pop()
             if eval.eval >= beta:
                 # print("here")
@@ -180,7 +198,6 @@ class MiniMaxABP(BaseChessAlgo):
                 )
             if eval.eval > alpha:
                 alpha = eval.eval
-
         return EvalReturnType(
             move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
             eval=alpha,
