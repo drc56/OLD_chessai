@@ -7,7 +7,7 @@ test:
 	./venv/bin/python3 -m pytest -v test
 
 lint:
-	black pychess_ai/ test/
+	./venv/bin/python3 -m black pychess_ai/ test/
 
 clean:
 	rm -rf venv

@@ -1,8 +1,32 @@
 import chess
 
+# fmt: off
+ROOK_EVAL_DICT = {
+    chess.WHITE :
+        [1.0, 1.0, 1.0, 1.5, 1.5, 1.0, 1.0, 1.0,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        1.5, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 1.5,
+        1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    chess.BLACK :
+        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+        1.5, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 1.5,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75,
+        1.0, 1.0, 1.0, 1.5, 1.5, 1.0, 1.0, 1.0],
+}
+# fmt: on
+
 
 class Evaluator:
     def __init__(self):
+        self._position_table = dict()
         pass
 
     def evaluate(
@@ -18,6 +42,12 @@ class Evaluator:
         Returns:
             float: The evaluation
         """
+
+        # Gonna use the FEN without the turn
+        epd_key = board.epd()
+        if epd_key in self._position_table:
+            return self._position_table[epd_key]
+
         evaluation = 0.0
         if board.is_checkmate():
             return 1000.0 - num_moves
@@ -42,6 +72,7 @@ class Evaluator:
                 material_value -= piece_value
 
         evaluation += material_value
+        self._position_table[epd_key] = evaluation
         return evaluation
 
     def _evaluate_rook(
@@ -59,7 +90,6 @@ class Evaluator:
                 piece_in_way = board.piece_at(square_to_check)
                 if piece_in_way is None:
                     continue
-                # print(piece_in_way.piece_type)
                 if piece_in_way.color != piece.color or (
                     piece_in_way.color == piece.color
                     and piece_in_way.piece_type != chess.QUEEN
@@ -71,5 +101,7 @@ class Evaluator:
 
         if open_file:
             eval = (eval) * 1.25
+        
+        eval = eval * ROOK_EVAL_DICT[piece.color][square]
 
         return eval

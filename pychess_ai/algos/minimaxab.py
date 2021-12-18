@@ -60,8 +60,11 @@ class MiniMaxABP(BaseChessAlgo):
         beta: int,
         color_to_play: chess.Color,
     ) -> float:
-        if depth == 0 or board.is_checkmate():
+        if board.is_checkmate():
             return self._evaluator.evaluate(board, num_moves, color_to_play)
+
+        if depth == 0:
+            return self._quiescence_search(board, alpha, beta, num_moves, color_to_play)
 
         # Set the eval to either very large negative of very large positive
         if is_maximizing:
@@ -116,3 +119,34 @@ class MiniMaxABP(BaseChessAlgo):
                     break
 
         return best_move
+
+    def _quiescence_search(
+        self,
+        board: chess.Board,
+        alpha: int,
+        beta: int,
+        num_moves: int,
+        color_to_play: chess.Color,
+    ) -> float:
+
+        eval = self._evaluator.evaluate(board, num_moves, color_to_play)
+
+        if eval >= beta:
+            return beta
+        if eval < alpha:
+            alpha = eval
+        legal_moves = self.generate_check_capture_move_list_order(board, True)
+
+        while legal_moves:
+            next_move = legal_moves.popleft()
+            board.push(next_move)
+            eval = self._quiescence_search(
+                board, alpha, beta, num_moves + 1, color_to_play
+            )
+            board.pop()
+            if eval >= beta:
+                return beta
+            else:
+                alpha = eval
+
+        return alpha

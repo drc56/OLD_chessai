@@ -5,6 +5,11 @@ from timeit import default_timer as timer
 import chess
 
 def main():
+
+    board = chess.Board()
+    print(chess.square_name(0))
+    print(chess.square_name(1))
+    print(chess.square_name(9))
     # board_fen_string = "3k4/8/1q5p/8/8/4B3/7R/4K3 w - - 0 1"
     # board = chess.Board(fen=board_fen_string)
     # print(board)
@@ -46,12 +51,16 @@ def main():
     print("------")
 
     board_fen_string = "1Q6/p7/q1p3p1/3p4/2kPpP2/4P1P1/P2B2K1/3r4 w - - 4 34"
-    chess_ai = ChessAi(Algo.ABP, 3, board_fen_string)
+    chess_ai = ChessAi(Algo.ABP, 1, board_fen_string)
     chess_ai.print_board()
+    print(chess_ai._board.fen())
+    print(chess_ai._board.epd())
     start = timer()
     next_move = chess_ai.take_turn(chess.WHITE)
     end = timer()
     print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
+
+
 
     # board_fen_string = "4rk2/p4ppp/1p2p3/3p4/3P4/1P2P3/P4PPP/4RK2 w - - 0 1"
     # board = chess.Board(fen=board_fen_string)

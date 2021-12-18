@@ -25,7 +25,9 @@ class BaseChessAlgo(ABC):
         raise NotImplementedError("Base Class doesn't have a get_next_move")
 
     @staticmethod
-    def generate_check_capture_move_list_order(board: chess.Board) -> deque:
+    def generate_check_capture_move_list_order(
+        board: chess.Board, only_checks_caps: bool = False
+    ) -> deque:
         # Let's make a move deque to sort it so checks and captures are front of the list
         # Also going to make a hokey dictionary for storing capture moves...since there's a generate function
         # Honestly not sure if that generate function is quick...
@@ -46,7 +48,7 @@ class BaseChessAlgo(ABC):
             if board.is_check():
                 legal_moves.appendleft(move)
             else:
-                if move not in capture_moves:
+                if move not in capture_moves and only_checks_caps is False:
                     legal_moves.append(move)
             board.pop()
         return legal_moves
