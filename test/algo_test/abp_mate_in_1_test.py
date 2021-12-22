@@ -1,7 +1,8 @@
 from pychess_ai.algos import MiniMaxABP
 import chess
+import logging
 
-TESTING_DEPTH = 1
+TESTING_DEPTH = 3
 
 
 def board_setup(fen: str) -> chess.Board:

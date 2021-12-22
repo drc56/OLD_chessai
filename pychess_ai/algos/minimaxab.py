@@ -10,7 +10,7 @@ class MiniMaxABP(BaseChessAlgo):
     BASE_ALPHA_VAL = -99999
     BASE_BETA_VAL = 99999
 
-    def __init__(self, depth: int, log_level):
+    def __init__(self, depth: int, log_level=logging.INFO):
         super().__init__(depth)
         self._logger = logging.getLogger("MiniMaxABP")
         self._logger.setLevel(log_level)

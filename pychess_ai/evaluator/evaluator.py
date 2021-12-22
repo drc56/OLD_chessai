@@ -106,7 +106,7 @@ class Evaluator:
 
         evaluation = 0.0
         if board.is_checkmate():
-            if board.outcome() == color_to_play:
+            if board.outcome().winner == color_to_play:
                 return EvalReturnType(
                     move=board.move_stack[len(board.move_stack) - (num_moves + 1)],
                     eval=10000.0 - num_moves,
