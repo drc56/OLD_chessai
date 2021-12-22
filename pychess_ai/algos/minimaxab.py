@@ -3,14 +3,17 @@ from collections import deque
 from pychess_ai.algos import BaseChessAlgo
 from pychess_ai.evaluator import EvalReturnType
 import chess
+import logging
 
 
 class MiniMaxABP(BaseChessAlgo):
     BASE_ALPHA_VAL = -99999
     BASE_BETA_VAL = 99999
 
-    def __init__(self, depth: int):
+    def __init__(self, depth: int, log_level):
         super().__init__(depth)
+        self._logger = logging.getLogger("MiniMaxABP")
+        self._logger.setLevel(log_level)
 
     @staticmethod
     def make_eval_string(board: chess.Board, move_list: list):
@@ -57,7 +60,7 @@ class MiniMaxABP(BaseChessAlgo):
                     color_to_play,
                 )
                 board.pop()
-                print(
+                self._logger.debug(
                     "Move: {}, Eval: {}, Line: {}".format(
                         board.san(eval.move),
                         eval.eval,

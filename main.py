@@ -4,11 +4,36 @@ from pychess_ai.algos import Algo
 from pychess_ai.chessai import ChessAi
 from timeit import default_timer as timer
 import chess
+import logging
 
 from pychess_ai.evaluator.evaluator import Evaluator
 
-def main():
+LOGGING_LEVEL = logging.INFO
 
+def main():
+    logger = logging.getLogger("chess ai")
+    logging.basicConfig(level=LOGGING_LEVEL)
+    logger.setLevel(LOGGING_LEVEL)
+
+    chess_ai = ChessAi(Algo.ABP, 3, chess.BLACK, logging_level=LOGGING_LEVEL)
+
+    while( not chess_ai.is_game_over()):
+        logger.info("Current board: ")
+        chess_ai.print_board()
+        
+        logger.info("Your Turn, input move:")
+        move = str(input())
+        while(not chess_ai.update_with_move(move)):
+            logger.info("Invalid move enter move again: ")
+            move = str(input())
+        
+        chess_ai.print_board()
+        ai_move = chess_ai.take_turn()
+
+        logger.info(f"AI moved {ai_move}")
+
+
+    # TODO (dan) convert all this trash below to unittests
     # board_fen_string = "3k4/8/1q5p/8/8/4B3/7R/4K3 w - - 0 1"
     # board = chess.Board(fen=board_fen_string)
     # print(board)
@@ -59,15 +84,15 @@ def main():
     # end = timer()
     # print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
 
-    board_fen_string = "5bk1/6p1/p1qr1pQP/1p2r3/1P6/P1NR4/5PP1/6K1 w - - 0 38"
-    chess_ai = ChessAi(Algo.ABP, 5, board_fen_string)
-    chess_ai.print_board()
-    print(chess_ai._board.fen())
-    print(chess_ai._board.epd())
-    start = timer()
-    next_move = chess_ai.take_turn(chess.WHITE)
-    end = timer()
-    print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
+    # board_fen_string = "5bk1/6p1/p1qr1pQP/1p2r3/1P6/P1NR4/5PP1/6K1 w - - 0 38"
+    # chess_ai = ChessAi(Algo.ABP, 5, board_fen_string)
+    # chess_ai.print_board()
+    # print(chess_ai._board.fen())
+    # print(chess_ai._board.epd())
+    # start = timer()
+    # next_move = chess_ai.take_turn(chess.WHITE)
+    # end = timer()
+    # print("ABP Time : {} ABP Move : {}".format((end-start), next_move))
 
 
     # board_fen_string = "5b1k/6pP/p1qr1pQ1/1p4r1/1P6/P1NR4/5PPK/8 w - - 3 40"
