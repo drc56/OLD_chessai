@@ -1,8 +1,6 @@
 import pytest
 from main import LOGGING_LEVEL
-from pychess_ai.algos import MiniMaxABP
 from abp_fixtures import ABP_setup
-import chess
 import logging
 
 TESTING_DEPTH = 3
